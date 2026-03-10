@@ -39,7 +39,7 @@ class ModelProvider(ABC):
     # All concrete providers must define their supported models
     MODEL_CAPABILITIES: dict[str, Any] = {}
 
-    def __init__(self, api_key: str, **kwargs):
+    def __init__(self, api_key: Optional[str] = None, **kwargs):
         """Initialize the provider with API key and optional configuration."""
         self.api_key = api_key
         self.config = kwargs
