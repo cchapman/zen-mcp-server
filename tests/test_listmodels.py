@@ -27,12 +27,12 @@ class TestListModelsTool:
     @pytest.mark.asyncio
     async def test_execute_with_no_providers(self, tool):
         """Test listing models with no providers configured"""
-        # Mock ADC to prevent it from being detected
-        with patch("providers.registry.ModelProviderRegistry._has_google_adc", return_value=False):
-            with patch.dict(os.environ, {}, clear=True):
-                # Set auto mode
-                os.environ["DEFAULT_MODEL"] = "auto"
+        with patch.dict(os.environ, {}, clear=True):
+            # Set auto mode
+            os.environ["DEFAULT_MODEL"] = "auto"
 
+            # Mock ADC to prevent it from detecting gcloud credentials
+            with patch("providers.registry.ModelProviderRegistry._has_google_adc", return_value=False):
                 result = await tool.execute({})
 
                 assert len(result) == 1
@@ -67,7 +67,7 @@ class TestListModelsTool:
 
             # Check Gemini shows as configured
             assert "Google Gemini ✅" in content
-            assert "`flash` → `gemini-2.5-flash`" in content
+            assert "`flash` → `gemini-3-flash-preview`" in content  # flash now points to Gemini 3 Flash
             assert "`pro` → `gemini-3-pro-preview`" in content
             assert "1M context" in content
             assert "Supports structured code generation" in content
