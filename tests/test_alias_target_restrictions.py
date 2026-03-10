@@ -85,7 +85,7 @@ class TestAliasTargetRestrictions:
         provider = OpenAIModelProvider(api_key="test-key")
 
         assert provider.validate_model_name("gpt5")
-        assert provider.validate_model_name("gpt-5")
+        assert provider.validate_model_name("gpt-5.4")
 
     @patch.dict(os.environ, {"GOOGLE_ALLOWED_MODELS": "gemini-3-flash-preview"})  # Allow target
     def test_gemini_restriction_policy_allows_alias_when_target_allowed(self):
@@ -171,8 +171,8 @@ class TestAliasTargetRestrictions:
         provider = OpenAIModelProvider(api_key="test-key")
         service = ModelRestrictionService()
 
-        assert service.is_allowed(ProviderType.OPENAI, "gpt-5")
-        assert provider.validate_model_name("gpt-5")
+        assert service.is_allowed(ProviderType.OPENAI, "gpt-5.4")
+        assert provider.validate_model_name("gpt-5.4")
 
     @patch.dict(os.environ, {"GOOGLE_ALLOWED_MODELS": "flash"}, clear=True)
     def test_service_alias_allows_canonical_gemini(self):

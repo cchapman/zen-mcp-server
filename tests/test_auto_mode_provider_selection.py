@@ -60,7 +60,7 @@ class TestAutoModeProviderSelection:
 
             # Should select appropriate Gemini models
             # Note: Gemini 3 Flash has higher intelligence score (17) than Gemini 2.5 Flash (10)
-            assert extended_reasoning in ["gemini-3-pro-preview", "gemini-2.5-pro", "pro"]
+            assert extended_reasoning in ["gemini-3.1-pro-preview", "gemini-3-pro-preview", "gemini-2.5-pro", "pro"]
             assert fast_response in ["gemini-3-flash-preview", "gemini-2.5-flash", "flash"]
             assert balanced in ["gemini-3-flash-preview", "gemini-2.5-flash", "flash"]
 
@@ -140,7 +140,7 @@ class TestAutoModeProviderSelection:
             fast_response = ModelProviderRegistry.get_preferred_fallback_model(ToolModelCategory.FAST_RESPONSE)
 
             # Should prefer Gemini now (based on new provider priority: Gemini before OpenAI)
-            assert extended_reasoning == "gemini-3-pro-preview"  # Gemini 3 Pro Preview has higher priority now
+            assert extended_reasoning == "gemini-3.1-pro-preview"  # Gemini 3.1 Pro Preview has higher priority now
 
             # Should prefer Gemini 3 Flash for fast response (higher intelligence score than 2.5)
             assert fast_response == "gemini-3-flash-preview"  # Gemini 3 Flash has higher intelligence score
@@ -323,7 +323,7 @@ class TestAutoModeProviderSelection:
                     "gemini-3-flash-preview",
                 ),  # "flash" now points to Gemini 3 Flash
                 ("flash2.5", ProviderType.GOOGLE, "gemini-2.5-flash"),  # "flash2.5" for legacy Gemini 2.5 Flash
-                ("pro", ProviderType.GOOGLE, "gemini-3-pro-preview"),  # "pro" resolves to gemini-3-pro-preview
+                ("pro", ProviderType.GOOGLE, "gemini-3.1-pro-preview"),  # "pro" resolves to gemini-3.1-pro-preview
                 ("mini", ProviderType.OPENAI, "gpt-5-mini"),  # "mini" now resolves to gpt-5-mini
                 ("o3mini", ProviderType.OPENAI, "o3-mini"),
                 ("grok", ProviderType.XAI, "grok-4"),

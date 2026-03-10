@@ -118,6 +118,7 @@ class TestModelSelection:
             # EXTENDED_REASONING can legitimately map to multiple Gemini fallbacks depending on registry
             # preferences and what models are allowed/available in the environment.
             assert model in [
+                "gemini-3.1-pro-preview",
                 "gemini-3-pro-preview",
                 "gemini-3-flash-preview",
                 "gemini-2.5-flash",

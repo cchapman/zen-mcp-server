@@ -81,7 +81,7 @@ class TestOpenAIProvider:
         assert provider._resolve_model_name("o3mini") == "o3-mini"
         assert provider._resolve_model_name("o4mini") == "o4-mini"
         assert provider._resolve_model_name("o4mini") == "o4-mini"
-        assert provider._resolve_model_name("gpt5") == "gpt-5"
+        assert provider._resolve_model_name("gpt5") == "gpt-5.4"
         assert provider._resolve_model_name("gpt5-mini") == "gpt-5-mini"
         assert provider._resolve_model_name("gpt5mini") == "gpt-5-mini"
         assert provider._resolve_model_name("gpt5.2") == "gpt-5.2"

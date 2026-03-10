@@ -80,7 +80,7 @@ class TestAutoModeComprehensive:
                     "OPENROUTER_API_KEY": None,
                 },
                 {
-                    "EXTENDED_REASONING": "gemini-3-pro-preview",  # Gemini 3 Pro Preview for deep thinking
+                    "EXTENDED_REASONING": "gemini-3.1-pro-preview",  # Gemini 3.1 Pro Preview for deep thinking
                     "FAST_RESPONSE": "gemini-3-flash-preview",  # Gemini 3 Flash for speed (higher intelligence than 2.5)
                     "BALANCED": "gemini-3-flash-preview",  # Gemini 3 Flash as balanced
                 },
@@ -122,7 +122,7 @@ class TestAutoModeComprehensive:
                     "OPENROUTER_API_KEY": None,
                 },
                 {
-                    "EXTENDED_REASONING": "gemini-3-pro-preview",  # Gemini 3 Pro Preview comes first in priority
+                    "EXTENDED_REASONING": "gemini-3.1-pro-preview",  # Gemini 3.1 Pro Preview comes first in priority
                     "FAST_RESPONSE": "gemini-3-flash-preview",  # Gemini 3 Flash for speed (higher intelligence)
                     "BALANCED": "gemini-3-flash-preview",  # Gemini 3 Flash as balanced
                 },
@@ -136,7 +136,7 @@ class TestAutoModeComprehensive:
                     "OPENROUTER_API_KEY": None,
                 },
                 {
-                    "EXTENDED_REASONING": "gemini-3-pro-preview",  # Gemini 3 Pro Preview comes first in priority
+                    "EXTENDED_REASONING": "gemini-3.1-pro-preview",  # Gemini 3.1 Pro Preview comes first in priority
                     "FAST_RESPONSE": "gemini-3-flash-preview",  # Gemini 3 Flash for speed (higher intelligence)
                     "BALANCED": "gemini-3-flash-preview",  # Gemini 3 Flash as balanced
                 },
