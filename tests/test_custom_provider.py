@@ -87,9 +87,9 @@ class TestCustomProvider:
         provider = CustomProvider(api_key="test-key", base_url="http://localhost:11434/v1")
 
         # Test that aliases resolve properly
-        # "llama" now resolves to "meta-llama/llama-3-70b" (the OpenRouter model)
-        resolved = provider._resolve_model_name("llama")
-        assert resolved == "meta-llama/llama-3-70b"
+        # "deepseek" resolves to "deepseek/deepseek-r1-0528" (the OpenRouter model)
+        resolved = provider._resolve_model_name("deepseek")
+        assert resolved == "deepseek/deepseek-r1-0528"
 
         # Test local model alias
         resolved_local = provider._resolve_model_name("local-llama")
@@ -216,8 +216,8 @@ class TestCustomProviderRegistration:
             custom_provider = custom_provider_factory()
             openrouter_provider = OpenRouterProvider(api_key="test-openrouter-key")
 
-            assert not custom_provider.validate_model_name("llama")
-            assert openrouter_provider.validate_model_name("llama")
+            assert not custom_provider.validate_model_name("deepseek")
+            assert openrouter_provider.validate_model_name("deepseek")
 
 
 class TestConfigureProvidersFunction:
@@ -309,15 +309,15 @@ class TestConfigureProvidersFunction:
             assert ProviderType.CUSTOM in available
 
     def test_configure_providers_no_valid_keys(self):
-        """Test configure_providers raises error when no valid API keys."""
+        """Test configure_providers raises error when no valid API keys and no ADC."""
         from server import configure_providers
 
-        # Mock ADC to simulate environment without Google Cloud credentials
-        with patch("providers.registry.ModelProviderRegistry._has_google_adc", return_value=False):
-            with patch.dict(
-                os.environ,
-                {"GEMINI_API_KEY": "", "OPENAI_API_KEY": "", "OPENROUTER_API_KEY": "", "CUSTOM_API_URL": ""},
-                clear=True,
-            ):
+        with patch.dict(
+            os.environ,
+            {"GEMINI_API_KEY": "", "OPENAI_API_KEY": "", "OPENROUTER_API_KEY": "", "CUSTOM_API_URL": ""},
+            clear=True,
+        ):
+            # Also disable ADC so Gemini can't fall back to gcloud credentials
+            with patch("providers.registry.ModelProviderRegistry._has_google_adc", return_value=False):
                 with pytest.raises(ValueError, match="At least one API configuration is required"):
                     configure_providers()
