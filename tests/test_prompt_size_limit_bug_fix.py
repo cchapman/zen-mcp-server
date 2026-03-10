@@ -5,6 +5,8 @@ This test verifies that SimpleTool correctly validates only the original user pr
 when conversation history is embedded, rather than validating the full enhanced prompt.
 """
 
+from unittest.mock import patch
+
 from tools.chat import ChatTool
 from tools.shared.base_models import ToolRequest
 
@@ -50,9 +52,11 @@ class TestPromptSizeLimitBugFix:
         assert size_check is None  # No size limit error
 
         # Test that size check would fail with enhanced prompt
-        size_check_enhanced = tool.check_prompt_size(enhanced_prompt)
-        assert size_check_enhanced is not None  # Would trigger size limit
-        assert size_check_enhanced["status"] == "resend_prompt"
+        # Pin the limit to 60K so the test isn't affected by MAX_MCP_OUTPUT_TOKENS in the environment
+        with patch("tools.shared.base_tool.MCP_PROMPT_SIZE_LIMIT", 60_000):
+            size_check_enhanced = tool.check_prompt_size(enhanced_prompt)
+            assert size_check_enhanced is not None  # Would trigger size limit
+            assert size_check_enhanced["status"] == "resend_prompt"
 
     def test_prompt_size_validation_without_original_prompt(self):
         """Test fallback behavior when no original prompt is stored (new conversations)"""
