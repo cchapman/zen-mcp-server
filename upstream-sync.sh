@@ -7,9 +7,12 @@ set -euo pipefail
 #   1. User runs: ./upstream-sync.sh check
 #   2. User picks a PR: "Review upstream PR #400 for quality and security"
 #   3. Claude reviews the diff, reports findings
-#   4. Claude runs: ./upstream-sync.sh start 400
-#   5. Claude makes adjustments on the upstream/pr-400 branch
-#   6. Claude runs: ./upstream-sync.sh apply 400
+#   4. Claude creates integration branch: git checkout -b upstream-sync/YYYY-MM-DD
+#   5. Claude runs: ./upstream-sync.sh start 400
+#   6. Claude makes adjustments on the upstream/pr-400 branch
+#   7. Claude runs: ./upstream-sync.sh apply 400  (merges onto integration branch)
+#   8. Repeat steps 2-7 for more PRs in the same session
+#   9. Run full tests, then merge integration branch to main
 #
 # For Claude: When asked to review a PR, use:
 #   gh pr view <PR#> --repo BeehiveInnovations/pal-mcp-server
@@ -251,9 +254,6 @@ cmd_start() {
     git fetch "$UPSTREAM_REMOTE" "pull/${pr_num}/head:${branch_name}" --quiet
     git checkout "$branch_name"
 
-    # Make sure we're on the new branch
-    git checkout "$branch_name" 2>/dev/null || true
-
     # Update tracking
     local tmp
     tmp=$(mktemp)
@@ -305,12 +305,27 @@ cmd_apply() {
     title=$(jq -r --arg pr "$pr_num" '.prs[$pr].title' "$TRACKING_FILE")
     author=$(jq -r --arg pr "$pr_num" '.prs[$pr].author' "$TRACKING_FILE")
 
-    # Switch to main
-    echo -e "${CYAN}Switching to main...${NC}"
-    git checkout main
+    # Determine target branch (integration branch or main)
+    local target_branch
+    target_branch=$(git branch --show-current 2>/dev/null || echo "")
+
+    # If we're on the PR branch, switch to the integration branch or main
+    if [[ "$target_branch" == "$branch_name" || -z "$target_branch" ]]; then
+        # Look for an integration branch, fall back to main
+        local integration_branch
+        integration_branch=$(git branch --list 'upstream-sync/*' | head -1 | tr -d ' *')
+        if [[ -n "$integration_branch" ]]; then
+            target_branch="$integration_branch"
+        else
+            target_branch="main"
+        fi
+    fi
+
+    echo -e "${CYAN}Switching to ${target_branch}...${NC}"
+    git checkout "$target_branch"
 
     # Squash merge
-    echo -e "${CYAN}Squash-merging ${branch_name}...${NC}"
+    echo -e "${CYAN}Squash-merging ${branch_name} into ${target_branch}...${NC}"
     git merge --squash "$branch_name"
 
     # Commit with attribution
@@ -334,10 +349,15 @@ EOF
     mv "$tmp" "$TRACKING_FILE"
 
     echo ""
-    echo -e "${GREEN}PR #${pr_num} applied to main.${NC}"
+    echo -e "${GREEN}PR #${pr_num} applied to ${target_branch}.${NC}"
     echo -e "  Commit: $(git log --oneline -1)"
     echo ""
-    echo -e "${BOLD}Remember:${NC} Push when ready with 'git push origin main'"
+    if [[ "$target_branch" != "main" ]]; then
+        echo -e "${BOLD}Remember:${NC} When done with all PRs, merge to main:"
+        echo -e "  git checkout main && git merge ${target_branch} && git branch -d ${target_branch}"
+    else
+        echo -e "${BOLD}Remember:${NC} Push when ready with 'git push origin main'"
+    fi
 }
 
 cmd_skip() {
@@ -410,22 +430,33 @@ upstream-sync.sh — Manage cherry-picks from upstream pal-mcp-server
          gh pr diff 400 --repo BeehiveInnovations/pal-mcp-server
          gh pr view 400 --repo BeehiveInnovations/pal-mcp-server
     2. Report findings (quality, security, data exfiltration risks)
-    3. If approved by user, create the local branch:
+    3. If approved, create integration branch (once per session):
+         git checkout -b upstream-sync/YYYY-MM-DD
+    4. Fetch the PR for local review/adjustment:
          ./upstream-sync.sh start 400
-    4. Make any needed adjustments on the upstream/pr-400 branch
-    5. Run tests: ./code_quality_checks.sh
-    6. When ready, squash-merge to main:
+    5. Make any needed adjustments on the upstream/pr-400 branch
+    6. Run tests: ./code_quality_checks.sh
+    7. Squash-merge onto integration branch:
          ./upstream-sync.sh apply 400
-    7. Do NOT push — user decides when to push
+    8. Repeat steps 1-7 for more PRs in the same session
+    9. When done, run full test suite, then merge to main:
+         git checkout main && git merge upstream-sync/YYYY-MM-DD
+   10. Do NOT push — user decides when to push
 
 ━━━ Commands ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
   check               Fetch upstream, show new commits + open PRs
   start <PR#>         Fetch PR branch → upstream/pr-<N>, mark reviewing
-  apply <PR#>         Squash-merge PR branch to main, clean up
+  apply <PR#>         Squash-merge PR branch onto current branch, clean up
   skip <PR#> [reason] Mark PR as skipped (won't show as NEW again)
   status              Show all tracked PRs grouped by status
   help                Show this help
+
+━━━ Branch Strategy ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  main                       Stable branch — only merged integration branches
+  upstream-sync/YYYY-MM-DD   Integration branch for a session of cherry-picks
+  upstream/pr-<N>            Temporary branch per PR for review & adjustment
 
 ━━━ Files ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 

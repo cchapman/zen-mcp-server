@@ -5,11 +5,39 @@
 
 This guide explains how to configure PAL MCP Server to work with [Gemini CLI](https://github.com/google-gemini/gemini-cli).
 
+## Authentication
+
+The Gemini provider supports two authentication methods:
+
+### Method A: API Key (default)
+1. Visit [Google AI Studio](https://makersuite.google.com/app/apikey)
+2. Generate an API key
+3. Set `GEMINI_API_KEY` in your `.env` file or MCP config
+
+### Method B: Application Default Credentials (ADC)
+Use your existing Google Cloud credentials — no API key needed.
+
+**Local development:**
+```bash
+gcloud auth application-default login
+```
+Then leave `GEMINI_API_KEY` empty or remove it from your `.env` file. The server auto-detects ADC.
+
+**GCP environments (Cloud Run, GKE, Compute Engine):**
+ADC is automatic via the attached service account. No configuration needed — just don't set `GEMINI_API_KEY`.
+
+**How it works:** The server checks for `GEMINI_API_KEY` first. If not found, it calls `google.auth.default()` to look for ADC credentials in this order:
+1. `GOOGLE_APPLICATION_CREDENTIALS` environment variable
+2. gcloud CLI credentials (`~/.config/gcloud/application_default_credentials.json`)
+3. GCE/Cloud Run metadata server
+
+Billing goes to whichever GCP project your ADC credentials are scoped to.
+
 ## Prerequisites
 
 - PAL MCP Server installed and configured
 - Gemini CLI installed
-- At least one API key configured in your `.env` file
+- At least one API key or ADC configured
 
 ## Configuration
 

@@ -26,9 +26,13 @@ OPENAI_API_KEY=your-openai-key
 
 **Option 1: Native APIs (Recommended for direct access)**
 ```env
-# Google Gemini API
+# Google Gemini API — choose one authentication method:
+# Method A: API Key (works anywhere)
 GEMINI_API_KEY=your_gemini_api_key_here
 # Get from: https://makersuite.google.com/app/apikey
+# Method B: ADC (GCP environments) — leave GEMINI_API_KEY empty/commented out
+# Run: gcloud auth application-default login (local dev)
+# Or use attached service account (Cloud Run, GKE, Compute Engine)
 
 # OpenAI API  
 OPENAI_API_KEY=your_openai_api_key_here

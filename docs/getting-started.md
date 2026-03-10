@@ -22,10 +22,10 @@ You need at least one API key. Choose based on your needs:
 
 ### Option B: Native Provider APIs
 
-**Gemini (Google):**
-- Visit [Google AI Studio](https://makersuite.google.com/app/apikey)
-- Generate an API key
-- **Note**: For Gemini 3.0 / 2.5 Pro, use a paid API key (free tier has limited access)
+**Gemini (Google)** — choose one:
+- **API Key**: Visit [Google AI Studio](https://makersuite.google.com/app/apikey) and generate a key
+  - **Note**: For Gemini 3.0 / 2.5 Pro, use a paid API key (free tier has limited access)
+- **Application Default Credentials (ADC)**: If you use `gcloud`, no API key needed — just run `gcloud auth application-default login` and leave `GEMINI_API_KEY` unset. Also works automatically on GCP (Cloud Run, GKE, Compute Engine) via attached service accounts.
 
 **OpenAI:**
 - Visit [OpenAI Platform](https://platform.openai.com/api-keys)
@@ -286,7 +286,7 @@ nano .env
 Add your API keys (at least one required):
 ```env
 # Choose your providers (at least one required)
-GEMINI_API_KEY=your-gemini-api-key-here      # For Gemini models  
+GEMINI_API_KEY=your-gemini-api-key-here      # For Gemini models (or omit for ADC)
 OPENAI_API_KEY=your-openai-api-key-here      # For GPT-5.2, GPT-5.1-Codex, O3
 XAI_API_KEY=your-xai-api-key-here            # For Grok models
 OPENROUTER_API_KEY=your-openrouter-key       # For multiple models

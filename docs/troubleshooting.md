@@ -38,9 +38,13 @@ cat .env
 # Ensure at least one key is set:
 # GEMINI_API_KEY=your-key-here
 # OPENAI_API_KEY=your-key-here
+
+# For Gemini, you can also use Application Default Credentials (ADC)
+# instead of an API key. Check if ADC is configured:
+gcloud auth application-default print-access-token 2>/dev/null && echo "ADC configured" || echo "ADC not configured"
 ```
 
-If you need to update your API keys, edit the `.env` file and then restart Claude for changes to take effect.
+If you need to update your API keys, edit the `.env` file and then restart Claude for changes to take effect. For Gemini with ADC, ensure `gcloud auth application-default login` has been run and `GEMINI_API_KEY` is unset or empty.
 
 ### 4. Check Server Logs
 
